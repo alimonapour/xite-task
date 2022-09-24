@@ -8,6 +8,7 @@ export function useFetchData() {
   const { data, error } = useSWR(apiUrl, fetcher)
   return {
     allMusicVideos: data?.videos,
+    allGenres: data?.genres,
     isLoading: !error && !data,
     isError: error,
   }
