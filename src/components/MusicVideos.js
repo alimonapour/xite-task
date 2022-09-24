@@ -1,26 +1,14 @@
 import { useRef } from 'react'
 import clsx from 'clsx'
-import useSWR from 'swr'
 import useLazyLoad from './utils/useLazyLoad'
 import { Card } from './UI/Card'
 import PageSpinner from './UI/PageSpinner'
 import { LoadingMusicVideos } from './LoadingMusicVideos'
-
-const apiUrl =
-  'https://raw.githubusercontent.com/XiteTV/frontend-coding-exercise/main/data/dataset.json'
+import { useFetchData } from './hooks/useFetchData'
 
 const NUM_PER_PAGE = 20
 const TOTAL_PAGES = 250
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json())
-function useFetchData() {
-  const { data, error } = useSWR(apiUrl, fetcher)
-  return {
-    allMusicVideos: data?.videos,
-    isLoading: !error && !data,
-    isError: error,
-  }
-}
 function sortByNewestToOld(first, second) {
   return second.release_year - first.release_year
 }
