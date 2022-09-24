@@ -9,6 +9,9 @@ module.exports = {
         // Complex site-specific column configuration
         footer: '200px minmax(900px, 1fr) 100px',
       },
+      backgroundImage: {
+        'hero-pattern': "url('components/assets/xite.png')",
+      },
     },
     container: {
       center: true,
