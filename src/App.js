@@ -1,9 +1,9 @@
 import './App.css'
-import MusicVideos from './components/MusicVideos'
+import MainPage from './components/MainPage'
 function App() {
   return (
     <div className='App'>
-      <MusicVideos />
+      <MainPage />
     </div>
   )
 }
