@@ -26,7 +26,7 @@ npm start
 yarn start
 ```
 
-You can now view xite-task in the browser.
+You can now view xite-task in the browser:
 
   Local:            http://localhost:3000
   
