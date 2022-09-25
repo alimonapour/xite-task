@@ -7,13 +7,23 @@ The app was developed with React library and used tailwindcss for responsive and
 ## Getting start
 
 First, In the project directory, you should run: 
+
 ```bash
 npm install
 # or
 yarn install
 ``` 
-to install the dependencies you need to run the app locally. 
-After install the dependencies you can run the app with : npm start.
+to install the dependencies you need to run the app locally.\ 
+
+
+After install the dependencies you can run the development server : 
+
+```bash
+npm start
+# or
+yarn start
+```
+
 You can now view xite-task in the browser.
 
   Local:            http://localhost:3000
