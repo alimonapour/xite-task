@@ -2,11 +2,11 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-The app was developed with React library and used tailwindcss for responsive design .
+The app was developed with React library and used tailwindcss for responsive and design .
 
 ## Getting start
 
-In the project directory, you can run: 
+In the project directory, you should run: 
 Use npm install to install the dependencies you need to run the app locally. 
 After install the dependencies you can run the app with : npm start.
 You can now view xite-task in the browser.
