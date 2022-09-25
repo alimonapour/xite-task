@@ -11,7 +11,8 @@ First, In the project directory, you should run:
 npm install
 # or
 yarn install
-``` to install the dependencies you need to run the app locally. 
+``` 
+to install the dependencies you need to run the app locally. 
 After install the dependencies you can run the app with : npm start.
 You can now view xite-task in the browser.
 
