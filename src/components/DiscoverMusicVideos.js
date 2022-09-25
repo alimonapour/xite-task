@@ -1,14 +1,17 @@
 import React from 'react'
-import { useFetchData } from './hooks/useFetchData'
+import { useFetchData } from './hooks/useFetchMusicVideos'
 import { Card } from './UI/Card'
-import Spinner from './UI/Spinner'
+
+function sortByNewestToOld(first, second) {
+  return second.release_year - first.release_year
+}
 
 const DiscoverMusicVideos = ({ query }) => {
-  const { allMusicVideos, isLoading, isError } = useFetchData()
+  const { allMusicVideos } = useFetchData()
   let musicVideos = []
   if (query.length > 0) {
-    musicVideos = allMusicVideos.filter((el) => {
-      return Object.values(el).some((val) =>
+    musicVideos = allMusicVideos.filter(({ artist, title }) => {
+      return Object.values({ artist, title }).some((val) =>
         String(val).toLowerCase().includes(query),
       )
     })
@@ -16,37 +19,24 @@ const DiscoverMusicVideos = ({ query }) => {
 
   return (
     <div>
-      {isError ? (
-        <div className='flex flex-col items-center justify-between text-rose-600 text-lg '>
-          <p>There was an error:</p>
-          <pre>{isError?.message}</pre>
-        </div>
-      ) : null}
-
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <>
-          <div className='grid grid-cols-16 gap-4'>
-            {musicVideos.length === 0 && (
-              <p>
-                Hmmm... There were no music videos found with this search.
-                <br /> Please try another.
-              </p>
-            )}
-            {musicVideos.map((video) => {
-              return (
-                <Card
-                  key={video.id}
-                  artist={video.artist}
-                  title={video.title}
-                  imageUrl={video.image_url}
-                />
-              )
-            })}
-          </div>
-        </>
+      {musicVideos.length === 0 && (
+        <p className='text-base font-semibold'>
+          Hmmm... There were no music videos found with this search.
+          <br /> Please try another.
+        </p>
       )}
+      <div className='grid sm:grid-cols-16 lg:grid-cols-4 gap-4 mt-3  '>
+        {musicVideos.sort(sortByNewestToOld).map((video) => {
+          return (
+            <Card
+              key={video.id}
+              artist={video.artist}
+              title={video.title}
+              imageUrl={video.image_url}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }
