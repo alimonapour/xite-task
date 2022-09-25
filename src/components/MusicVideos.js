@@ -2,13 +2,11 @@ import { useRef, useState } from 'react'
 import clsx from 'clsx'
 import useLazyLoad from './utils/useLazyLoad'
 import { Card } from './UI/Card'
-import PageSpinner from './UI/PageSpinner'
-import { LoadingMusicVideos } from './LoadingMusicVideos'
-import { useFetchData } from './hooks/useFetchData'
+import { MusicVideosSkeleton } from './MusicVideosSkeleton'
+import { useFetchData } from './hooks/useFetchMusicVideos'
 import Select from 'react-select'
 
-const NUM_PER_PAGE = 20
-const TOTAL_PAGES = 250
+const PAGE_SIZE = 20
 
 function sortByNewestToOld(first, second) {
   return second.release_year - first.release_year
@@ -17,7 +15,7 @@ function sortByNewestToOld(first, second) {
 const MusicVideos = () => {
   const [musicVideoGenreOptions, setMusicVideoGenreOptions] = useState()
   const [musicVideoReleaseYear, setMusicVideoReleaseYear] = useState()
-  const { allMusicVideos, isLoading, isError, allGenres } = useFetchData()
+  const { allMusicVideos, isLoading, allGenres } = useFetchData()
   const musicVideosReleaseYear = [
     ...new Map(
       allMusicVideos?.map(({ release_year }) => [release_year, release_year]),
@@ -26,16 +24,25 @@ const MusicVideos = () => {
 
   const triggerRef = useRef(null)
   const onGrabData = (currentPage) => {
+    const totalPagesCount = allMusicVideos.length / PAGE_SIZE
     let musicVideos = allMusicVideos
       .sort(sortByNewestToOld)
       .slice(
-        ((currentPage - 1) % TOTAL_PAGES) * NUM_PER_PAGE,
-        NUM_PER_PAGE * (currentPage % TOTAL_PAGES),
+        ((currentPage - 1) % totalPagesCount) * PAGE_SIZE,
+        PAGE_SIZE * (currentPage % totalPagesCount),
       )
     return musicVideos
   }
-  let { data: musicVideos, loading } = useLazyLoad({ triggerRef, onGrabData })
+  let {
+    data: musicVideos,
+    loading,
+    currentPage,
+  } = useLazyLoad({
+    triggerRef,
+    onGrabData,
+  })
 
+  let hasMore = currentPage * PAGE_SIZE <= allMusicVideos?.length
   function filterVideosByYear(musicVideoReleaseYear) {
     if (musicVideoReleaseYear?.length > 0) {
       musicVideos = allMusicVideos.filter((data) =>
@@ -46,7 +53,15 @@ const MusicVideos = () => {
     return musicVideos
   }
 
-  filterVideosByYear(musicVideoReleaseYear)
+  const filteredMusicViodeosByYear =
+    musicVideoReleaseYear?.length >= 1
+      ? filterVideosByYear(musicVideoReleaseYear)
+      : []
+
+  hasMore =
+    filteredMusicViodeosByYear?.length >= 1
+      ? currentPage * PAGE_SIZE <= filteredMusicViodeosByYear?.length
+      : currentPage * PAGE_SIZE <= allMusicVideos?.length
 
   function filterVideosByGenre(musicVideoGenreOptions) {
     if (musicVideoGenreOptions?.length > 0) {
@@ -57,7 +72,15 @@ const MusicVideos = () => {
     return musicVideos
   }
 
-  filterVideosByGenre(musicVideoGenreOptions)
+  const filteredMusicViodeosByGenres =
+    musicVideoGenreOptions?.length >= 1
+      ? filterVideosByGenre(musicVideoGenreOptions)
+      : []
+
+  hasMore =
+    filteredMusicViodeosByGenres?.length >= 1
+      ? currentPage * PAGE_SIZE <= filteredMusicViodeosByGenres?.length
+      : currentPage * PAGE_SIZE <= allMusicVideos?.length
 
   let genreListItems = []
   for (let i = 0; i < allGenres?.length; i++) {
@@ -82,40 +105,36 @@ const MusicVideos = () => {
 
   return (
     <div>
-      {isError ? (
-        <div className='flex flex-col items-center justify-between text-rose-600 text-lg '>
-          <p>There was an error:</p>
-          <pre>{isError?.message}</pre>
+      <div className='grid items-center gap-2.5 grid-cols-16'>
+        <div>
+          <Select
+            options={genreListItems}
+            placeholder='Select genre'
+            value={musicVideoGenreOptions}
+            onChange={handleGenreOptionChanges}
+            isSearchable={true}
+            isMulti
+          />
         </div>
-      ) : null}
+        <div>
+          <Select
+            options={yearListItems}
+            placeholder='Select year'
+            value={musicVideoReleaseYear}
+            onChange={handleYeraOptionChanges}
+            isSearchable={true}
+            isMulti
+          />
+        </div>
+      </div>
 
       {isLoading ? (
-        <PageSpinner />
+        <div className='mt-3'>
+          <MusicVideosSkeleton />
+        </div>
       ) : (
         <>
-          <div className='grid items-center gap-2.5 grid-cols-16'>
-            <div>
-              <Select
-                options={genreListItems}
-                placeholder='Select genre'
-                value={musicVideoGenreOptions}
-                onChange={handleGenreOptionChanges}
-                isSearchable={true}
-                isMulti
-              />
-            </div>
-            <div>
-              <Select
-                options={yearListItems}
-                placeholder='Select year'
-                value={musicVideoReleaseYear}
-                onChange={handleYeraOptionChanges}
-                isSearchable={true}
-                isMulti
-              />
-            </div>
-          </div>
-          <div className='grid grid-cols-16 gap-4 mt-3'>
+          <div className='grid sm:grid-cols-16 lg:grid-cols-4 gap-4 mt-3'>
             {musicVideos.map((video) => {
               return (
                 <Card
@@ -129,9 +148,11 @@ const MusicVideos = () => {
           </div>
           <div
             ref={triggerRef}
-            className={clsx('trigger', { visible: loading })}
+            className={clsx('trigger', {
+              hidden: !hasMore || loading,
+            })}
           >
-            <LoadingMusicVideos />
+            <MusicVideosSkeleton />
           </div>
         </>
       )}
