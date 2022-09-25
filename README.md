@@ -29,6 +29,8 @@ yarn start
 You can now view xite-task in the browser.
 
   Local:            http://localhost:3000
+  
+  
   On Your Network:  http://192.168.1.102:3000
 
 
