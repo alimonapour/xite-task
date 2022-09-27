@@ -2,7 +2,7 @@ export const Card = ({ artist, title, imageUrl }) => {
   return (
     <div className='rounded overflow-hidden shadow-lg'>
       <div
-        className='w-full h-64 object-center bg-cover'
+        className='w-full h-64 object-center bg-cover bg-center'
         style={{ backgroundImage: `url(${imageUrl})` }}
       ></div>
       <img
