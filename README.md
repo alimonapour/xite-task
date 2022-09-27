@@ -1,24 +1,22 @@
 # The XITE
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with
+[Create React App](https://github.com/facebook/create-react-app).
 
-The XITE task is an assignment for candidate front-end developers at the XITE company.
-
-The app was developed with React library and used tailwindcss for responsive and design .
+This is a web app that fetches and displays a list of music videos. It also
+supports client-side filtering, searching, and infinite scrolling.
 
 ## Getting start
 
-First, In the project directory, you should run: 
+In the project directory, install dependencies by running:
 
 ```bash
 npm install
 # or
 yarn install
-``` 
-to install the dependencies you need to run the app locally.
+```
 
-
-After install the dependencies you can run the development server : 
+Run the development server:
 
 ```bash
 npm start
@@ -26,12 +24,8 @@ npm start
 yarn start
 ```
 
-You can now view xite-task in the browser:
+You can now see the app in the browser:
 
-  Local:            http://localhost:3000
-  
-  
-  On Your Network:  http://192.168.1.102:3000
+Local: http://localhost:3000
 
-
-
+On Your Network: http://192.168.1.102:3000
