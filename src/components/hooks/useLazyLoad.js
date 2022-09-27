@@ -1,76 +1,31 @@
-import { useEffect, useReducer, useCallback } from 'react'
-import debounce from 'lodash/debounce'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useScrollEnd } from './useScrollEnd'
 
-const INTERSECTION_THRESHOLD = 5
-const LOAD_DELAY_MS = 500
+const PAGE_SIZE = 20
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'set': {
-      return {
-        ...state,
-        ...action.payload,
-      }
+export function useLazyLoad(items, loaderTriggerElement) {
+  const lastItems = useRef(null)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const totalPagesCount = items?.length
+  const isLastPage = totalPagesCount === currentPage || totalPagesCount === 0
+
+  const onScrollEnd = useCallback(() => {
+    if (!isLastPage) {
+      setCurrentPage(currentPage + 1)
     }
-    case 'onGrabData': {
-      return {
-        ...state,
-        loading: false,
-        data: [...state.data, ...action.payload.data],
-        currentPage: state.currentPage + 1,
-      }
-    }
-
-    default:
-      return state
-  }
-}
-
-const useLazyLoad = ({ triggerRef, onGrabData, options }) => {
-  const [state, dispatch] = useReducer(reducer, {
-    loading: false,
-    currentPage: 1,
-    data: [],
-  })
-
-  const _handleEntry = async (entry) => {
-    console.log(entry)
-    const boundingRect = entry.boundingClientRect
-    const intersectionRect = entry.intersectionRect
-
-    if (
-      !state.loading &&
-      entry.isIntersecting &&
-      intersectionRect.bottom - boundingRect.bottom <= INTERSECTION_THRESHOLD
-    ) {
-      dispatch({ type: 'set', payload: { loading: true } })
-      const data = await onGrabData(state.currentPage)
-      dispatch({ type: 'onGrabData', payload: { data } })
-    }
-  }
-  const handleEntry = debounce(_handleEntry, LOAD_DELAY_MS)
-
-  const onIntersect = useCallback(
-    (entries) => {
-      handleEntry(entries[0])
-    },
-    [handleEntry],
-  )
+  }, [currentPage, isLastPage])
 
   useEffect(() => {
-    if (triggerRef.current) {
-      const container = triggerRef.current
-      const observer = new IntersectionObserver(onIntersect, options)
-
-      observer.observe(container)
-
-      return () => {
-        observer.disconnect()
-      }
+    if (lastItems.current !== items) {
+      setCurrentPage(1)
+      lastItems.current = items
     }
-  }, [triggerRef, onIntersect, options])
+  }, [items])
 
-  return state
+  useScrollEnd(loaderTriggerElement, onScrollEnd)
+
+  const visibleItems = items?.slice(0, currentPage * PAGE_SIZE)
+
+  return { visibleItems, currentPage, isLastPage }
 }
-
-export default useLazyLoad
