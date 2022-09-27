@@ -1,52 +1,27 @@
 import React from 'react'
-import { useFetchData } from './hooks/useFetchMusicVideos'
-import MusicVideos from './MusicVideos'
-import ScrollButton from './UI/ScrollToTopButton'
 import Select from 'react-select'
+import { useFetchData } from './hooks/useFetchMusicVideos'
+import MusicVideosList from './MusicVideosList'
+import ScrollButton from './UI/ScrollToTopButton'
+import { MusicVideosSkeleton } from './UI/MusicVideosSkeleton'
+import { filterMusicVideos } from './utils/FilterFunction'
 
 const MainPage = () => {
   const [query, setQuery] = React.useState('')
-  const [musicVideoGenreOptions, setMusicVideoGenreOptions] = React.useState([])
-  const [musicVideoReleaseYear, setMusicVideoReleaseYear] = React.useState([])
+  const [genresFilter, setGenresFilter] = React.useState([])
+  const [releaseYearsFilter, setReleaseYearsFilter] = React.useState([])
   const { isError, allMusicVideos, allGenres, isLoading } = useFetchData()
 
   const musicVideosReleaseYear = [
-    ...new Map(
-      allMusicVideos?.map(({ release_year }) => [release_year, release_year]),
+    ...new Set(
+      allMusicVideos?.map(({ release_year }) => release_year),
     ).values(),
   ]
 
-  function filterMusicVideos(
-    musicVideoReleaseYear,
-    musicVideoGenreOptions,
-    query,
-  ) {
-    let filteredList = allMusicVideos
-    if (musicVideoGenreOptions?.length > 0) {
-      filteredList = filteredList.filter((musicVideo) =>
-        musicVideoGenreOptions.find((i) => i.value === musicVideo.genre_id),
-      )
-    }
-
-    if (musicVideoReleaseYear?.length > 0) {
-      filteredList = filteredList.filter((musicVideo) =>
-        musicVideoReleaseYear.find((i) => i.value === musicVideo.release_year),
-      )
-    }
-
-    if (query.length > 0) {
-      filteredList = filteredList.filter(({ artist, title }) => {
-        return Object.values({ artist, title }).some((val) =>
-          String(val).toLowerCase().includes(query),
-        )
-      })
-    }
-    return filteredList
-  }
-
   const filteredMusicVideos = filterMusicVideos(
-    musicVideoReleaseYear,
-    musicVideoGenreOptions,
+    allMusicVideos,
+    releaseYearsFilter,
+    genresFilter,
     query,
   )
 
@@ -69,67 +44,61 @@ const MainPage = () => {
   }
 
   const handleGenreOptionChanges = (data) => {
-    setMusicVideoGenreOptions(data)
+    setGenresFilter(data)
   }
 
-  const handleYeraOptionChanges = (data) => {
-    setMusicVideoReleaseYear(data)
+  const handleYearsOptionChanges = (data) => {
+    setReleaseYearsFilter(data)
   }
 
   return (
-    <div>
-      {isError ? (
-        <div className='flex flex-col items-center justify-between text-rose-600 text-lg mt-3'>
-          <p>There was an error:</p>
-          <>
-            <pre>An error occurred while fetching the data.</pre>
-            <pre>Please try again later.</pre>
-          </>
+    <div className='py-7 space-y-7'>
+      <div className='grid items-center gap-y-5 gap-x-5 grid-cols-2 xl:grid-cols-3'>
+        <input
+          required
+          placeholder='Search music videos...'
+          className='w-full py-0.5 px-2 rounded border border-[#ccc] box-border min-h-[38px] col-span-full xl:col-auto focus:border-2 outline-[#2684ff] focus:shadow-sm-[#2684ff] font-sans placeholder:text-[#808080]'
+          value={query}
+          type='text'
+          onChange={handleINputChange}
+        />
+        <div className='col-span-full sm:col-auto'>
+          <Select
+            options={genreListItems}
+            placeholder='Select genre'
+            value={genresFilter}
+            onChange={handleGenreOptionChanges}
+            isSearchable={true}
+            isMulti
+          />
         </div>
-      ) : (
-        <div className='mt-5'>
-          <input
-            required
-            placeholder='Search music videos...'
-            className='serch-input'
-            value={query}
-            type='text'
-            onChange={handleINputChange}
+        <div className='col-span-full sm:col-auto'>
+          <Select
+            options={yearListItems}
+            placeholder='Select year'
+            value={releaseYearsFilter}
+            onChange={handleYearsOptionChanges}
+            isSearchable={true}
+            isMulti
           />
+        </div>
+      </div>
+      {isError && (
+        <div className='flex flex-col items-center justify-between text-rose-600 text-lg mt-3'>
+          <pre>There was a problem.</pre>
 
-          <div className='grid items-center gap-2.5 sm: grid-cols-16 lg:grid-cols-2'>
-            <div>
-              <Select
-                options={genreListItems}
-                placeholder='Select genre'
-                value={musicVideoGenreOptions}
-                onChange={handleGenreOptionChanges}
-                isSearchable={true}
-                isMulti
-              />
-            </div>
-            <div>
-              <Select
-                options={yearListItems}
-                placeholder='Select year'
-                value={musicVideoReleaseYear}
-                onChange={handleYeraOptionChanges}
-                isSearchable={true}
-                isMulti
-              />
-            </div>
-          </div>
-          <MusicVideos
-            musicVideos={filteredMusicVideos}
-            isLoading={isLoading}
-            dependencies={[
-              musicVideosReleaseYear.length,
-              musicVideoGenreOptions.length,
-            ]}
-          />
-          <ScrollButton />
+          <pre>Please try again later.</pre>
         </div>
       )}
+
+      {isLoading && (
+        <div className='mt-3'>
+          <MusicVideosSkeleton />
+        </div>
+      )}
+
+      <MusicVideosList items={filteredMusicVideos} />
+      <ScrollButton />
     </div>
   )
 }
