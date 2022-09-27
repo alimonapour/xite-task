@@ -20,7 +20,7 @@ export function filterMusicVideos(
   if (query?.length > 0) {
     filteredList = filteredList.filter(({ artist, title }) => {
       return Object.values({ artist, title }).some((val) =>
-        String(val).toLowerCase().includes(query),
+        String(val).toLowerCase().includes(query.toLowerCase()),
       )
     })
   }
