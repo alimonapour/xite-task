@@ -3,7 +3,6 @@ import { Card } from './UI/Card'
 import { useLazyLoad } from './hooks/useLazyLoad'
 
 export default function MusicVideosList({ items }) {
-  console.log(6, '>>>', items)
   const loaderTriggerRef = useRef(null)
   const { visibleItems, isLastPage } = useLazyLoad(
     items,
