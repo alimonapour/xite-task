@@ -21,7 +21,7 @@ export default function MusicVideosList({ items }) {
           />
         ))
       ) : (
-        <p className='text-base font-semibold text-center'>
+        <p className='col-span-full text-lg font-bold text-center'>
           Hmmm... There were no music videos found with this search.
           <br /> Please try another.
         </p>
