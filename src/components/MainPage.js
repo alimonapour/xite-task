@@ -10,7 +10,7 @@ const MainPage = () => {
   const [query, setQuery] = React.useState('')
   const [genresFilter, setGenresFilter] = React.useState([])
   const [releaseYearsFilter, setReleaseYearsFilter] = React.useState([])
-  const { isError, allMusicVideos, allGenres, isLoading } = useFetchData()
+  const { allMusicVideos, allGenres, isLoading, isError } = useFetchData()
 
   const musicVideosReleaseYear = [
     ...new Set(
@@ -97,6 +97,12 @@ const MainPage = () => {
         </div>
       )}
 
+      {filteredMusicVideos?.length === 0 && (
+        <p className='col-span-full text-lg font-bold text-center'>
+          Hmmm... There were no music videos found with this search.
+          <br /> Please try another.
+        </p>
+      )}
       <MusicVideosList items={filteredMusicVideos} />
       <ScrollButton />
     </div>
