@@ -15,7 +15,7 @@ export const CardSkeleton = () => {
 export const MusicVideosSkeleton = () => {
   const skeletonRange = [...Array(10).keys()].map((n) => n + 1)
   return (
-    <div className='grid grid-cols-16 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-pulse'>
+    <div className='grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-pulse'>
       {skeletonRange.map((num) => {
         return <CardSkeleton key={num} />
       })}
